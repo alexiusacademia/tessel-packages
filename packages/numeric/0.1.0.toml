@@ -1,0 +1,8 @@
+name = "numeric"
+version = "0.1.0"
+description = "Root finding, integration and differential equations"
+license = "MIT"
+repository = "https://github.com/alexiusacademia/numeric"
+tag = "v0.1.0"
+commit = "c740c696208ef646ae8fd5aecca3a63788c921c0"
+checksum = "sha256:dc9b65c9460247acbe610441f16ac5facde01fa0c1ebd42f81ffba4fb2bbbda7"
