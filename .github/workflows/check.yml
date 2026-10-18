@@ -1,0 +1,54 @@
+# Checks the versions a pull request proposes: every file it adds under
+# packages/ with `tessel publish --check`. Published versions never change,
+# so a request that changes or deletes one fails.
+name: Check
+
+on:
+  pull_request:
+    paths: ["packages/**"]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    # (Tessel is released for macOS and Windows.)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Tessel
+        run: |
+          curl -fsSL https://storage.googleapis.com/tessel-releases/install.sh | sh
+          echo "$HOME/.tessel/bin" >> "$GITHUB_PATH"
+        env:
+          TESSEL_NO_STATS: "1"
+
+      - name: Check the proposed versions
+        env:
+          # The index as this request would make it, so a library can use
+          # one published in the same request.
+          TESSEL_INDEX: ${{ github.workspace }}
+          TESSEL_NO_STATS: "1"
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          base="origin/${{ github.base_ref }}"
+          status=0
+          while IFS=$'\t' read -r change file; do
+            case "$change" in
+              A) ;;
+              *) echo "::error file=$file::published versions can't be changed or removed ($change)"; status=1; continue ;;
+            esac
+            case "$file" in
+              packages/*/*.toml) ;;
+              *) echo "::error file=$file::only packages/<name>/<version>.toml files belong here"; status=1; continue ;;
+            esac
+            echo "Checking $file"
+            if ! tessel publish --check "$file"; then
+              echo "::error file=$file::the check failed"
+              status=1
+            fi
+          done < <(git diff --name-status "$base"...HEAD -- packages/ ':!packages/.gitkeep')
+          exit $status
