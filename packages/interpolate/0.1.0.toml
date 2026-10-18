@@ -1,0 +1,8 @@
+name = "interpolate"
+version = "0.1.0"
+description = "Linear interpolation"
+license = "MIT"
+repository = "https://github.com/alexiusacademia/interpolate"
+tag = "v0.1.0"
+commit = "d2558b513667b483a6641408785f7f9b532b7ceb"
+checksum = "sha256:f0d20dd6b71b9ae0acecaa7f5c4e3b6c9955ad1c62fbbf70d98391a9795112eb"
