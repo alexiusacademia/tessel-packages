@@ -1,0 +1,8 @@
+name = "regex"
+version = "0.1.0"
+description = "Regular expressions that always run in linear time: groups, classes, anchors, flags, replace and split"
+license = "MIT"
+repository = "https://github.com/alexiusacademia/regex"
+tag = "v0.1.0"
+commit = "996360fa9eac1c09c6f5f60f29f396db82029ece"
+checksum = "sha256:541d3ab2434baa820a96928a85a04a09177b789b6fe02074274aa5e2a0674a92"
