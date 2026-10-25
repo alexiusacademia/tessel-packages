@@ -1,0 +1,8 @@
+name = "viewport"
+version = "0.1.0"
+description = "Pan, zoom, rotate and fit for Canvas views: world/screen conversions, mouse and key handling, zoom boxes, smooth moves, grids, rulers and scale bars"
+license = "MIT"
+repository = "https://github.com/alexiusacademia/viewport"
+tag = "v0.1.0"
+commit = "49f72d2d2be7970f7f8dc453628b24b03074a6d2"
+checksum = "sha256:4de4e68a30c41588dbe29d2a0b8f9e482f7672dc55d777e40b4d59459182fb31"
