@@ -1,0 +1,15 @@
+# The index's website. Netlify builds it from this folder on every push to
+# main, so a merged version shows up by itself.
+# Author: Alexius Academia
+# Date: 2026-10-25
+[build]
+  command = "pip install -r requirements.txt && python3 build.py"
+  publish = "dist"
+  # Always build: the entries are outside this folder.
+  ignore = "exit 1"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+    X-Content-Type-Options = "nosniff"
