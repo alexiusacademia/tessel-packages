@@ -1,0 +1,8 @@
+name = "pytessel"
+version = "0.2.0"
+description = "A Python interpreter: run Python code from a Tessel program"
+license = "MIT"
+repository = "https://github.com/alexiusacademia/pytessel"
+tag = "v0.2.0"
+commit = "6fb44868f9a4caaff3443aa684a00e52a1cb21e2"
+checksum = "sha256:a07746c2e7b9e9fd1dc79bd8b2c886470ac8f8570cf3ac88eaf778b4d3bbf740"
