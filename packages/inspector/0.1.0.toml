@@ -1,0 +1,8 @@
+name = "inspector"
+version = "0.1.0"
+description = "Property panels: number rows with units and math, choices, colors, toggles, sections and search"
+license = "MIT"
+repository = "https://github.com/alexiusacademia/inspector"
+tag = "v0.1.0"
+commit = "ae56282e1af1fce9385c2d56e5df55b498b84add"
+checksum = "sha256:aa09dc0f7b75b34148c63199862aaf1e279e8f76a0b7161451e95f061f4985ed"
