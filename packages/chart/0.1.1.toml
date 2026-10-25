@@ -1,0 +1,8 @@
+name = "chart"
+version = "0.1.1"
+description = "Charts for Canvas, PNG and PDF: lines, scatter, areas, bars, log axes, legends"
+license = "MIT"
+repository = "https://github.com/alexiusacademia/chart"
+tag = "v0.1.1"
+commit = "67a3a5edd9bf8de99ec798e76c54433fa2956f64"
+checksum = "sha256:37d03e33a5cc3f574a00351d1afc2767b922994e2a86ac718a14564e604c864d"
