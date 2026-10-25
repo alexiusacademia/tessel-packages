@@ -1,0 +1,8 @@
+name = "csv"
+version = "0.1.0"
+description = "Read and write CSV files: quoted fields, any separator, headers, columns as numbers"
+license = "MIT"
+repository = "https://github.com/alexiusacademia/csv"
+tag = "v0.1.0"
+commit = "6d832613c19a5415fc05b35f0f9b154429755a07"
+checksum = "sha256:00c6037f8f7a354c1c8fe0b3ca73f951ddc50afb8a0ec838f4125ded5f6b55fc"
