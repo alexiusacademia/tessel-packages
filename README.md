@@ -6,6 +6,10 @@ programs. Each published version is one file,
 its git repository, and the commit and checksum it had when published)
 and which libraries it uses. The code itself stays in its own repository.
 
+Browse them at **[tessel-packages.syncster.dev](https://tessel-packages.syncster.dev)**,
+which is rebuilt from this repository whenever a version is merged
+(`site/`).
+
 ## Using a library
 
 ```sh
