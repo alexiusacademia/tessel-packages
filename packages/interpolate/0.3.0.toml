@@ -1,0 +1,8 @@
+name = "interpolate"
+version = "0.3.0"
+description = "Interpolation: linear, cubic splines, shape-keeping (PCHIP), Akima and steps, with slopes, areas, inverse lookup and 2D grids; scattered points by Delaunay TIN, nearest, inverse distance or thin-plate spline, with contours"
+license = "MIT"
+repository = "https://github.com/alexiusacademia/interpolate"
+tag = "v0.3.0"
+commit = "6e3e40183400cf6d3aea8f19b5c3057d1fb449ae"
+checksum = "sha256:9db5562a3fa1c7f626a34f9094caa910aae100ffab40cd41fd56717ec3311fdb"
