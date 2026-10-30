@@ -6,3 +6,6 @@ repository = "https://github.com/alexiusacademia/inspector"
 tag = "v0.2.0"
 commit = "ce83c530a76f0a10af98bab12ccdbf96b6c24332"
 checksum = "sha256:d4bb482f540a4c88b98e4e1b6e74b289f22713809c29acacfb1f5187eaec9be7"
+
+[dependencies]
+units = "0.1"
