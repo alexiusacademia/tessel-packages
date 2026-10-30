@@ -1,0 +1,8 @@
+name = "geodesy"
+version = "0.2.0"
+description = "Geodesy: exact distances, azimuths and areas on the ellipsoid (Karney), rhumb lines, map projections (UTM, TM, Lambert, Mercator, Albers, stereographic, oblique Mercator, Krovak, Swiss, polyconic, Equal Earth…), datum shifts, EPSG codes, PROJ strings, WKT, degrees as text and MGRS"
+license = "MIT"
+repository = "https://github.com/alexiusacademia/geodesy"
+tag = "v0.2.0"
+commit = "01cb19eb391b86af63c57331e26f0e5132f15512"
+checksum = "sha256:22c995437c18beaf8b202b6c9ab4e70059227bae3d00cff2603e3205f3849ad1"
