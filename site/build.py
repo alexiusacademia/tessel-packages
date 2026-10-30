@@ -1,7 +1,9 @@
 """Builds the index's website (https://tessel-packages.syncster.dev) from
 the entries in ../packages: a home page listing every library, with a
-search box, and a page for each with its versions, the libraries it uses
-and its README (fetched from its repository at the latest version's tag).
+search box, and a page for each with its versions, the libraries it uses,
+what uses it (other libraries here, and public GitHub repositories, which
+needs GITHUB_TOKEN) and its README (fetched from its repository at the
+latest version's tag).
 
 Netlify runs it on every push to main (see netlify.toml), so a merged
 version shows up by itself. Run it locally with:
@@ -10,7 +12,7 @@ version shows up by itself. Run it locally with:
     python3 build.py            # writes dist/
 
 Author: Alexius Academia
-Date: 2026-10-25
+Date: 2026-10-25 (used-by counts 2026-10-30)
 """
 
 import html
@@ -25,6 +27,11 @@ import urllib.request
 from datetime import datetime, timezone
 
 from markdown_it import MarkdownIt
+
+try:
+    import tomllib
+except ImportError:  # Python before 3.11
+    import tomli as tomllib
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 INDEX = os.path.normpath(os.path.join(HERE, "..", "packages"))
@@ -149,6 +156,95 @@ def homepage_of(entry):
         return ""
 
 
+# --- Who uses each library -----------------------------------------------
+#
+# A library's dependents are the other libraries in the index whose latest
+# version uses it, and the public GitHub repositories with a tessel.toml
+# that lists it in [dependencies]: as a version ("0.1" or { version = … })
+# or as { git = <the library's repository>, tag = … }. A { path = … } is a
+# folder on someone's computer, so it isn't counted. Each repository counts
+# once, and a library's own repository (its examples) doesn't count.
+
+def repo_key(url):
+    gh = github_path(url)
+    return f"{gh[0]}/{gh[1]}".lower() if gh else (url or "").lower().rstrip("/")
+
+
+def uses_library(value, repository):
+    """Whether a [dependencies] value is this index's library."""
+    if isinstance(value, str):
+        return True
+    if isinstance(value, dict):
+        if "path" in value:
+            return False
+        if "git" in value:
+            return repo_key(str(value["git"])) == repo_key(repository)
+        return "version" in value
+    return False
+
+
+def github_manifests():
+    """The tessel.toml files in public GitHub repositories: (repository,
+    path, url of its text). GitHub's code search needs a token, so without
+    GITHUB_TOKEN this finds none."""
+    if not os.environ.get("GITHUB_TOKEN"):
+        print("  no GITHUB_TOKEN: dependents come from the index only", file=sys.stderr)
+        return []
+    found, page = [], 1
+    while page <= 10:  # GitHub returns at most 1,000 results
+        url = f"https://api.github.com/search/code?q=filename:tessel.toml&per_page=100&page={page}"
+        try:
+            data = json.loads(fetch(url, "application/vnd.github+json"))
+        except Exception as e:
+            print(f"  can't search GitHub (page {page}): {e}", file=sys.stderr)
+            break
+        items = data.get("items") or []
+        for it in items:
+            repo = it.get("repository") or {}
+            # Only public repositories: a private one's name isn't ours to show.
+            if repo.get("private") is not False or repo.get("fork"):
+                continue
+            if os.path.basename(it.get("path", "")) != "tessel.toml":
+                continue
+            full = repo.get("full_name", "")
+            sha = (re.search(r"[?&]ref=([0-9a-f]{40})", it.get("url", "")) or [None, None])[1]
+            ref = sha or repo.get("default_branch") or "HEAD"
+            found.append((full, it["path"], f"https://raw.githubusercontent.com/{full}/{ref}/{it['path']}"))
+        if len(items) < 100 or page * 100 >= data.get("total_count", 0):
+            break
+        page += 1
+    return found
+
+
+def find_dependents(libs):
+    """For each library, {repository key: (name to show, link, index
+    library or None)} of what uses it."""
+    users = {name: {} for name in libs}
+    repo_of = {name: repo_key(vs[0].get("repository", "")) for name, vs in libs.items()}
+    lib_of_repo = {key: name for name, key in repo_of.items()}
+    for name, versions in libs.items():
+        for dep in (versions[0].get("dependencies") or {}):
+            if dep in users and repo_of[dep] != repo_of[name]:
+                users[dep][repo_of[name]] = (name, f"../{name}/", name)
+    for full, path, url in github_manifests():
+        try:
+            manifest = tomllib.loads(fetch(url))
+        except Exception as e:
+            print(f"  can't read {full}/{path}: {e}", file=sys.stderr)
+            continue
+        deps = manifest.get("dependencies")
+        if not isinstance(deps, dict):
+            continue
+        key = full.lower()
+        for dep, value in deps.items():
+            if dep not in libs or key == repo_of[dep] or key in users[dep]:
+                continue
+            if uses_library(value, libs[dep][0].get("repository", "")):
+                lib = lib_of_repo.get(key)
+                users[dep][key] = (lib, f"../{lib}/", lib) if lib else (full, f"https://github.com/{full}", None)
+    return users
+
+
 # --- READMEs as HTML -----------------------------------------------------
 
 # Raw HTML in a README is shown as text, never run: these READMEs come from
@@ -271,6 +367,13 @@ def install_box(name):
             f'<button class="copy" type="button" data-copy="{esc(cmd)}">Copy</button></div>')
 
 
+LIBRARY_TAG = ' <span class="tag">library</span>'
+
+
+def used_by_label(n):
+    return f"used by {n} project{'s' if n != 1 else ''}"
+
+
 def home(libs, info, built):
     cards = []
     order = sorted(libs, key=lambda n: n)
@@ -281,6 +384,8 @@ def home(libs, info, built):
         if deps:
             uses = '<span class="uses">uses ' + ", ".join(
                 f'<a href="{esc(d)}/">{esc(d)}</a>' for d in sorted(deps)) + "</span>"
+        n = len(info[name]["dependents"])
+        used = f'<a class="used" href="{esc(name)}/#used-by">{used_by_label(n)}</a>' if n else ""
         site = info[name]["homepage"]
         links = f'<a href="{esc(name)}/">Details</a>'
         if site:
@@ -298,6 +403,7 @@ def home(libs, info, built):
           <span>{esc(latest.get("license", ""))}</span>
           {f'<span>{esc(latest["date"])}</span>' if latest.get("date") else ""}
           {uses}
+          {used}
         </div>
         <div class="lib-links">{links}</div>
       </article>""")
@@ -361,6 +467,17 @@ def detail(name, versions, info):
     if deps:
         uses = "<p class=\"intro\">Uses " + ", ".join(
             f'<a href="../{esc(d)}/">{esc(d)}</a> {esc(v)}' for d, v in sorted(deps.items())) + ".</p>"
+    dependents = sorted(info["dependents"].values(), key=lambda d: (d[2] is None, d[0].lower()))
+    if dependents:
+        items = "".join(
+            f'<li><a href="{esc(link)}">{esc(shown)}</a>{LIBRARY_TAG if lib else ""}</li>'
+            for shown, link, lib in dependents)
+        used_by = (f'<p class="intro">{len(dependents)} project{"s" if len(dependents) != 1 else ""} '
+                   f'use{"s" if len(dependents) == 1 else ""} {esc(name)}: libraries in this index and public GitHub repositories whose <code>tessel.toml</code> lists it.</p>'
+                   f'<ul class="dependents">{items}</ul>')
+    else:
+        used_by = (f'<p class="intro">No library in this index or public GitHub repository uses {esc(name)} yet. '
+                   f'Use it with <code>tessel add {esc(name)}</code> and it shows up here.</p>')
     if info["readme"]:
         readme = f'<article class="readme">{info["readme"]}</article>'
     else:
@@ -372,12 +489,18 @@ def detail(name, versions, info):
     <p class="lede">{esc(latest.get("description", ""))}</p>
     {install_box(name)}
     <div class="buttons">{links}</div>
-    <p class="meta">{esc(latest.get("license", ""))} licence · {len(versions)} version{"s" if len(versions) != 1 else ""}{(" · published " + esc(latest["date"])) if latest.get("date") else ""}</p>
+    <p class="meta">{esc(latest.get("license", ""))} licence · {len(versions)} version{"s" if len(versions) != 1 else ""} · <a href="#used-by">{used_by_label(len(info["dependents"]))}</a>{(" · published " + esc(latest["date"])) if latest.get("date") else ""}</p>
   </div>
 </div>
 <section class="readme-section">
   <div class="wrap">
     {readme}
+  </div>
+</section>
+<section id="used-by">
+  <div class="wrap">
+    <h2>Used by</h2>
+    {used_by}
   </div>
 </section>
 <section>
@@ -405,6 +528,7 @@ def main():
     os.makedirs(OUT)
     for f in os.listdir(os.path.join(HERE, "static")):
         shutil.copy(os.path.join(HERE, "static", f), os.path.join(OUT, f))
+    dependents = find_dependents(libs)
     info = {}
     for name, versions in libs.items():
         print(f"{name} {versions[0]['version']}")
@@ -412,6 +536,7 @@ def main():
         info[name] = {
             "readme": readme_html(text, versions[0]) if text else "",
             "homepage": homepage_of(versions[0]),
+            "dependents": dependents[name],
         }
     built = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     with open(os.path.join(OUT, "index.html"), "w", encoding="utf-8") as f:
@@ -427,6 +552,8 @@ def main():
         f.write("</urlset>\n")
     with open(os.path.join(OUT, "libraries.json"), "w", encoding="utf-8") as f:
         json.dump({n: [{k: v for k, v in e.items()} for e in vs] for n, vs in libs.items()}, f, indent=1)
+    with open(os.path.join(OUT, "dependents.json"), "w", encoding="utf-8") as f:
+        json.dump({n: sorted(d[0] for d in info[n]["dependents"].values()) for n in libs}, f, indent=1)
     missing = [n for n in libs if not info[n]["readme"]]
     print(f"{len(libs)} libraries -> {OUT}" + (f" (no README: {', '.join(missing)})" if missing else ""))
 

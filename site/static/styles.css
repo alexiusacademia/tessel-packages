@@ -306,3 +306,10 @@ section.list { padding-top: 12px; border-top: 0; }
 .readme td:first-child { white-space: normal; }
 .readme td:first-child code { color: var(--accent); background: none; padding: 0; }
 @media (max-width: 760px) { .libs { grid-template-columns: minmax(0, 1fr); } }
+
+/* Who uses a library */
+.lib-meta .used { color: var(--accent, #0063d1); text-decoration: none; }
+.lib-meta .used:hover { text-decoration: underline; }
+.dependents { list-style: none; padding: 0; margin: 14px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.dependents li { background: var(--surface); border: 1px solid var(--line, #d9dee5); border-radius: 8px; padding: 6px 12px; font-size: 14px; }
+.dependents .tag { color: var(--muted); font-size: 12px; margin-left: 4px; }
