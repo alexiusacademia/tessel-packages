@@ -1,0 +1,8 @@
+name = "units"
+version = "0.1.1"
+description = "Units for engineering: every unit pint knows plus engineering ones, conversions, checked quantities, reading \"5' 6 1/4\\\"\" and \"1 m + 50 mm\", formatting and unit systems"
+license = "MIT"
+repository = "https://github.com/alexiusacademia/units"
+tag = "v0.1.1"
+commit = "346965c342f75d97bc5663ef837ca6b538a88587"
+checksum = "sha256:ffa330d227503f30ad650ee491cd1bcb9d4b32b90755926fcb9bb7ca70714444"
