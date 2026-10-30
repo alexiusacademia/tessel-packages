@@ -1,0 +1,8 @@
+name = "text"
+version = "0.2.0"
+description = "Text tools: Unicode characters, words and sentences, hyphenation, fuzzy matching, stemming, search and readability"
+license = "MIT"
+repository = "https://github.com/alexiusacademia/text"
+tag = "v0.2.0"
+commit = "874b0e948bef49c485e24964a2245376c992f3bd"
+checksum = "sha256:bdc0af5582b480a1207077132eeed56f38dcf8264b0d3f5098f5626a0c1d0140"
