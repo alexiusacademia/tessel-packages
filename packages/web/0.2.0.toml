@@ -1,0 +1,8 @@
+name = "web"
+version = "0.2.0"
+description = "Web servers: routes, middleware, forms, cookies, sessions, static files and HTML templates"
+license = "MIT"
+repository = "https://github.com/alexiusacademia/web"
+tag = "v0.2.0"
+commit = "8b791b3e4276d7e52b3d1b57e192d707a980a562"
+checksum = "sha256:bb647eaeb187b8f6a7b553af980701c4a5487dbd85b4957d5c4e94de79f3ca88"
