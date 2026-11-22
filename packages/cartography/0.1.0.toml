@@ -1,0 +1,12 @@
+name = "cartography"
+version = "0.1.0"
+description = "Maps for Canvas views: vector layers with styles, labels and legends, basemap tiles, rasters with color ramps and hillshade, GeoJSON, Shapefile, KML, GPX, CSV, WKT and GeoPackage, in any coordinate system"
+license = "MIT"
+repository = "https://github.com/alexiusacademia/cartography"
+tag = "v0.1.0"
+commit = "2540e0add9181ff8554e7dec5abee0733b1c53aa"
+checksum = "sha256:ffd2065ff39e33efc0513207c0da166bb66fe45461368aabbfeef01bf83c2f73"
+
+[dependencies]
+geodesy = "0.2"
+viewport = "0.1"
